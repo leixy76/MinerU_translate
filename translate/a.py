@@ -1,7 +1,13 @@
-import json
+from transformers import M2M100Tokenizer
 
-a = {"attention":"原文中的参考文献包含作者姓名、年份、文章标题和出版信息，这些专有名词和格式需要保持不变，同时确保Markdown结构完整无损。","translate":"\[Yao  et al. , 2022\] Shunyu Yao, Jeffrey Zhao, et al. Re-act: Synergizing reasoning and acting in language models. arXiv preprint arXiv:2210.03629 , 2022.\n\n\[Yao  et al. , 2023\] Shunyu Yao, Dian Yu, et al. Tree of thoughts: Deliberate problem solving with large language models.  arXiv preprint arXiv:2305.10601 , 2023.\n\n\[Zeng  et al. , 2023\] Aohan Zeng, Mingdao Liu, et al. Agent-tuning: Enabling generalized agent abilities for llms.  arXiv preprint arXiv:2310.12823 , 2023.\n\n\[Zhang  et al. , 2023a\] Danyang Zhang, Lu Chen, et al. Large language model is semi-parametric reinforcement learning agent.  arXiv preprint arXiv:2306.07929 , 2023.\n\n\[Zhang  et al. , 2023b\] Yue Zhang, Yafu Li, et al. Siren’s song in the ai ocean: A survey on hallucination in large lan- guage models.  arXiv preprint arXiv:2309.01219 , 2023.\n\n\[Zhao  et al. , 2023a\] Wayne Xin Zhao, Kun Zhou, et al. A survey of large language models. arXiv preprint arXiv:2303.18223 , 2023.\n\n\[Zhao  et al. , 2023b\] Zirui Zhao, Wee Sun Lee, and David Hsu. Large language models as commonsense knowl- edge for large-scale task planning. arXiv preprint arXiv:2305.14078 , 2023."}
-print(a)
+# 加载分词器
+tokenizer = M2M100Tokenizer.from_pretrained("facebook/m2m100_418M")
 
-a = json.load(str(a))
-print(a)
+# 要统计的文本
+text = "Hello, how are you?"
+
+# 使用分词器编码文本
+tokens = tokenizer.encode(text)
+
+# 输出 token 数量
+print("Number of tokens:", len(tokens))

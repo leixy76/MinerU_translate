@@ -28,7 +28,7 @@ def create_output_directory(base_dir, original_file_name):
     return output_dir
 
 
-async def process_markdown_file(file_path, source_lang, target_lang, country):
+async def process_markdown_file(file_path, source_lang, target_lang, country, result_format='message'):
     try:
         if os.path.exists(file_path):
             # 创建输出目录
@@ -62,6 +62,7 @@ async def process_markdown_file(file_path, source_lang, target_lang, country):
             target_lang=target_lang,
             country=country,
             source_text=replaced_text,
+            result_format=result_format
         )
 
         if translation:
@@ -136,12 +137,12 @@ def save_markdown_as_pdf(markdown_text, pdf_file_path):
 
 if __name__ == '__main__':
     file_paths = [
-        r"C:\Users\yongjie.yang\Desktop\agent综述\agent综述\agent综述.md"
+        r"C:\Users\yongjie.yang\Desktop\Large Multimodal Model Prompting with Gemini\Set up Google Cloud.md"
         ,
     ]
     for path in file_paths:
         try:
-            asyncio.run(process_markdown_file(path, "英语", "汉语", "中国"))
+            asyncio.run(process_markdown_file(path, "英语", "汉语", "中国", result_format="text"))
             print(f"Processing completed for {path}")
         except Exception as e:
             print(f"Error processing {path}: {traceback.format_exc()}")

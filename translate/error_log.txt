@@ -1486,3 +1486,69 @@ KeyboardInterrupt
 2024-08-23 16:18:34,213 - ERROR - Error ID: e20a7e79-3ef8-4163-b31c-9fb07416d09f - Error: Unexpected response format.
 2024-08-23 16:19:08,642 - ERROR - Error ID: 81f5e65c-7be0-402c-b82c-1d30510a3ad6 - Error: Unexpected response format.
 2024-08-23 16:19:55,056 - ERROR - Error ID: 7df1ab1c-6c30-4979-a34c-ce713f5d4b37 - Error: Unexpected response format.
+2024-08-30 15:43:59,823 - ERROR - Error ID: 73815f2b-a27d-4b79-aa20-785ed292eb0f - Error: client_qwen 返回 None
+2024-08-30 15:44:35,067 - ERROR - Error ID: 50a6f482-c5a2-499a-85e5-db19590c7465 - Error: client_qwen 返回 None
+2024-08-30 15:44:54,492 - ERROR - Error ID: 9e969dea-988b-43f4-ad42-62f23b2fcc4a - Error: client_qwen 返回 None
+2024-08-30 15:45:13,437 - ERROR - Error ID: 6e3c31ed-68dd-46f7-bc35-ad7679a3a17f - Error: client_qwen 返回 None
+2024-08-30 15:45:46,494 - ERROR - Error ID: 420d045e-d229-4128-8e8e-9856260d7f5d - Error: client_qwen 返回 None
+2024-08-30 15:46:05,146 - ERROR - Error ID: c5ad8362-080b-43bf-868b-15c2ebe11ff1 - Error: client_qwen 返回 None
+2024-08-30 15:47:05,976 - ERROR - Error ID: 340445b4-db91-4ad9-a63a-5b9d56e426c7 - Error: client_qwen 返回 None
+2024-08-30 15:48:42,126 - ERROR - Error ID: 9d19a298-de64-420f-8fe7-2d317751d0eb - Error: client_qwen 返回 None
+2024-08-30 15:49:26,129 - ERROR - Error ID: 73b4cfe1-6f31-431f-963d-677f20f26c99 - Error: client_qwen 返回 None
+2024-08-30 15:49:40,889 - ERROR - Error ID: 296bb12a-6cec-412f-bfa6-9d3ec207cc17 - Error: client_qwen 返回 None
+2024-08-30 15:50:01,935 - ERROR - Error ID: 01a8f9c9-4bdd-4082-9192-5f797e156236 - Error: client_qwen 返回 None
+2024-08-30 15:50:35,075 - ERROR - Error ID: 0f44233e-8c38-4d99-b3b9-1e5aeed1f639 - Error: client_qwen 返回 None
+2024-08-30 16:28:47,892 - ERROR - Error ID: e9527cf4-0d01-4adf-a468-4c1fe9f9fe61 - Error: client_qwen 返回 None
+2024-08-30 16:29:01,707 - ERROR - Error ID: 60c5307b-c84e-423e-88b1-2eef6ee8aaf9 - Error: client_qwen 返回 None
+2024-08-30 16:29:13,621 - ERROR - Error ID: 30eb360f-0412-4b55-8bc5-23a74bb07ea5 - Error: client_qwen 返回 None
+2024-08-30 16:29:44,239 - ERROR - Error ID: 17e2ed3c-ac71-400d-83b2-40c276228d76 - Error: client_qwen 返回 None
+2024-08-30 16:29:56,709 - ERROR - Error ID: 0471fea1-d521-49c4-98f1-a067eee521eb - Error: client_qwen 返回 None
+2024-08-30 16:33:42,775 - ERROR - Error ID: a46829f2-2817-4d48-8dbf-6e01b5f825c5 - Error: client_qwen 返回 None
+2024-08-30 16:33:57,562 - ERROR - Error ID: b845e6a8-d344-400c-ba9c-247f38417061 - Error: client_qwen 返回 None
+2024-08-30 16:34:11,980 - ERROR - Error ID: e0f887a0-14e3-41ae-8104-aad87237fc22 - Error: client_qwen 返回 None
+2024-08-30 16:34:24,515 - ERROR - Error ID: afd8cd31-bd94-48f5-86c5-dd229ed28094 - Error: client_qwen 返回 None
+2024-08-30 16:34:38,638 - ERROR - Error ID: 15f497db-201b-41b8-9852-22aa416c2d7b - Error: client_qwen 返回 None
+2024-09-12 11:17:29,122 - ERROR - Error processing file C:\Users\yongjie.yang\Desktop\birefnet\birefnet.md: urllib3.exceptions.SSLError: [SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1007)
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "D:\Program Files\anaconda3\envs\MinerU\lib\site-packages\requests\adapters.py", line 667, in send
+    resp = conn.urlopen(
+  File "D:\Program Files\anaconda3\envs\MinerU\lib\site-packages\urllib3\connectionpool.py", line 843, in urlopen
+    retries = retries.increment(
+  File "D:\Program Files\anaconda3\envs\MinerU\lib\site-packages\urllib3\util\retry.py", line 519, in increment
+    raise MaxRetryError(_pool, url, reason) from reason  # type: ignore[arg-type]
+urllib3.exceptions.MaxRetryError: HTTPSConnectionPool(host='openaipublic.blob.core.windows.net', port=443): Max retries exceeded with url: /encodings/cl100k_base.tiktoken (Caused by SSLError(SSLEOFError(8, '[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1007)')))
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "D:\GitHub\MinerU\translate\main.py", line 60, in process_markdown_file
+    translation = await translate_markdown(
+  File "D:\GitHub\MinerU\translate\markdown_translate.py", line 461, in translate_markdown
+    num_tokens_in_text = num_tokens_in_string(source_text)  # 计算文本中的标记数量
+  File "D:\GitHub\MinerU\translate\markdown_translate.py", line 321, in num_tokens_in_string
+    encoding = tiktoken.get_encoding(encoding_name)  # 获取指定编码
+  File "D:\Program Files\anaconda3\envs\MinerU\lib\site-packages\tiktoken\registry.py", line 73, in get_encoding
+    enc = Encoding(**constructor())
+  File "D:\Program Files\anaconda3\envs\MinerU\lib\site-packages\tiktoken_ext\openai_public.py", line 72, in cl100k_base
+    mergeable_ranks = load_tiktoken_bpe(
+  File "D:\Program Files\anaconda3\envs\MinerU\lib\site-packages\tiktoken\load.py", line 147, in load_tiktoken_bpe
+    contents = read_file_cached(tiktoken_bpe_file, expected_hash)
+  File "D:\Program Files\anaconda3\envs\MinerU\lib\site-packages\tiktoken\load.py", line 64, in read_file_cached
+    contents = read_file(blobpath)
+  File "D:\Program Files\anaconda3\envs\MinerU\lib\site-packages\tiktoken\load.py", line 25, in read_file
+    resp = requests.get(blobpath)
+  File "D:\Program Files\anaconda3\envs\MinerU\lib\site-packages\requests\api.py", line 73, in get
+    return request("get", url, params=params, **kwargs)
+  File "D:\Program Files\anaconda3\envs\MinerU\lib\site-packages\requests\api.py", line 59, in request
+    return session.request(method=method, url=url, **kwargs)
+  File "D:\Program Files\anaconda3\envs\MinerU\lib\site-packages\requests\sessions.py", line 589, in request
+    resp = self.send(prep, **send_kwargs)
+  File "D:\Program Files\anaconda3\envs\MinerU\lib\site-packages\requests\sessions.py", line 703, in send
+    r = adapter.send(request, **kwargs)
+  File "D:\Program Files\anaconda3\envs\MinerU\lib\site-packages\requests\adapters.py", line 698, in send
+    raise SSLError(e, request=request)
+requests.exceptions.SSLError: HTTPSConnectionPool(host='openaipublic.blob.core.windows.net', port=443): Max retries exceeded with url: /encodings/cl100k_base.tiktoken (Caused by SSLError(SSLEOFError(8, '[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1007)')))
+

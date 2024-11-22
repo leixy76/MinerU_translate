@@ -100,19 +100,20 @@ async def get_completion(prompt: str, system_message: str = "You are a helpful a
 
             response, token_count = result  # 解包结果
 
-            # 检查 response 是否为字符串，如果是，尝试解析为 JSON
-            if isinstance(response, str):
-                try:
-                    response = json.loads(response)  # 尝试将字符串解析为 JSON
-                except json.JSONDecodeError:
-                    print(f"解析失败的结果为：{type(response)}\n{response}")
-                    print(f"解析失败: {traceback.format_exc()}")
-                    pass  # 如果解析失败，保持 response 为字符串
+            if result_format == 'message':
+                # 检查 response 是否为字符串，如果是，尝试解析为 JSON
+                if isinstance(response, str):
+                    try:
+                        response = json.loads(response)  # 尝试将字符串解析为 JSON
+                    except json.JSONDecodeError:
+                        print(f"解析失败的结果为：{type(response)}\n{response}")
+                        print(f"解析失败: {traceback.format_exc()}")
+                        pass  # 如果解析失败，保持 response 为字符串
 
             if isinstance(response, dict) and 'translate' in response and result_format == 'message':
                 # 如果 response 是一个字典并包含 'translate' 字段
                 return response['translate']
-            elif result_format == 'txt':
+            elif result_format == 'text':
                 # 如果 result_format 是 'txt'，直接返回 response
                 return response
             else:
@@ -134,7 +135,8 @@ async def get_completion(prompt: str, system_message: str = "You are a helpful a
 
 
 # 定义一个异步函数，用于翻译文本块
-async def one_chunk_translation(source_lang: str, target_lang: str, country: str, source_text: str) -> str:
+async def one_chunk_translation(source_lang: str, target_lang: str, country: str, source_text: str,
+                                result_format: str) -> str:
     """
     使用大型语言模型将文本块进行翻译。
 
@@ -151,30 +153,49 @@ async def one_chunk_translation(source_lang: str, target_lang: str, country: str
     system_message = f"您是一名翻译专家，专门从事从 {source_lang} 到 {target_lang} 的翻译。最终的翻译风格和语气应与在 {country} 日常口语中的 {target_lang} 风格相匹配。"
 
     # 构建翻译提示词，要求将文本从源语言翻译为目标语言
-    translation_prompt = f"""
-以下文本是Markdown格式的文档内容，请将其从 {source_lang} 翻译为 {target_lang}：
+    if result_format == 'message':
+        translation_prompt = f"""
+        以下文本是Markdown格式的文档内容，请将其从 {source_lang} 翻译为 {target_lang}：
+        
+        注意：
+        1. 请严格保留原文的Markdown结构，确保所有的占位符（<PH></PH>）及其包裹的内容不被翻译或修改。对于图片描述，请确保其与图片链接分开处理。
+        2. 请确保严格保留原文中markdown结构的标识，不要新增或者删除markdown标识以带来困惑。
+        3. 遇到作者姓名和参考文献时，请保持原文，不进行翻译。
+        4. 专有名词保留：原文中的专有名词（如人名、地名、品牌名等）应保持不变，避免误译。
+            4.1 不需要翻译的专有名词举例如(不区分大小写)：AI Agent、transformer、LLM、dspy、LangChain等。
+        5. 请仅翻译文本内容，避免对占位符和其他非文本内容进行任何修改。
+        6. 请以标准的 UTF-8 编码返回结果，避免使用 Unicode 转义字符。
+        
+        原文:
+        {source_text}
+        
+        请按下文json格式要求输出，不要有其他非json内容，并确保Markdown格式未被改变：
+        {{
+        "attention": 简要说明原文翻译的难点,
+        "translate": 翻译后的文本
+        }}
+        """
+    else:
+        translation_prompt = f"""
+        以下文本是Markdown格式的文档内容，请将其从 {source_lang} 翻译为 {target_lang}：
 
-注意：
-1. 请严格保留原文的Markdown结构，确保所有的占位符（<PH></PH>）及其包裹的内容不被翻译或修改。对于图片描述，请确保其与图片链接分开处理。
-2. 已经用<PH></PH>标记的部分，包括HTML标签、YAML头部、注释、代码块、表格、公式、行内代码、图片和网址等元素，请勿修改这些部分的内容或格式。
-3. 遇到作者姓名和参考文献时，请保持原文，不进行翻译。
-4. 专有名词保留：原文中的专有名词（如人名、地名、品牌名等）应保持不变，避免误译。
-4.1 不需要翻译的专有名词举例如(不区分大小写)：AI Agent、transformer、LLM、dspy、LangChain等。
-5. 请仅翻译文本内容，避免对占位符和其他非文本内容进行任何修改。
-6. 请以标准的 UTF-8 编码返回结果，避免使用 Unicode 转义字符。
+        注意：
+        1. 请严格保留原文的Markdown结构，确保所有的占位符（<PH></PH>）及其包裹的内容不被翻译或修改。对于图片描述，请确保其与图片链接分开处理。
+        2. 请确保严格保留原文中markdown结构的标识，不要新增或者删除markdown标识以带来困惑。
+        3. 遇到作者姓名和参考文献时，请保持原文，不进行翻译。
+        4. 专有名词保留：原文中的专有名词（如人名、地名、品牌名等）应保持不变，避免误译。
+            4.1 不需要翻译的专有名词举例如(不区分大小写)：AI Agent、transformer、LLM、dspy、LangChain等。
+        5. 请仅翻译文本内容，避免对占位符和其他非文本内容进行任何修改。
+        6. 请以标准的 UTF-8 编码返回结果，避免使用 Unicode 转义字符。
 
-原文:
-{source_text}
+        原文:
+        {source_text}
 
-请按下文json格式要求输出，不要有其他非json内容，并确保Markdown格式未被改变：
-{{
-"attention": 简要说明原文翻译的难点,
-"translate": 翻译后的文本
-}}
-"""
+        请仅输出翻译后的文本内容，保留原始占位符和markdown结构标识，不要添加额外说明或解释。
+        """
 
     # 调用 get_completion 函数获取翻译结果
-    translation = await get_completion(translation_prompt, system_message=system_message)
+    translation = await get_completion(translation_prompt, system_message=system_message, result_format=result_format)
     return translation  # 返回翻译后的文本
 
 
@@ -185,6 +206,8 @@ async def one_chunk_improve_translation(
         country: str,
         original_text: str,
         translated_text: str,
+        result_format: str
+
 ) -> str:
     """
     使用 LLM 对翻译进行改进检查并优化。
@@ -203,49 +226,83 @@ async def one_chunk_improve_translation(
     system_message = f"您是一名翻译质量审查员，专门从事从 {source_lang} 到 {target_lang} 的翻译质量改进。请确保翻译风格和语气符合在 {country} 日常口语中的 {target_lang} 风格。"
 
     # 构建改进提示词，要求模型根据提供的翻译文本进行改进
-    improvement_prompt = f"""
-这是一个针对Markdown格式文档内容的翻译质量改进请求，翻译方向是从 {source_lang} 到 {target_lang}。请根据以下标准对提供的译文进行分析、批评，并基于这些批评和建议改进翻译：
+    if result_format == 'message':
+        improvement_prompt = f"""
+        这是一个针对Markdown格式文档内容的翻译质量改进请求，翻译方向是从 {source_lang} 到 {target_lang}。请根据以下标准对提供的译文进行分析、批评，并基于这些批评和建议改进翻译：
+        
+        注意：
+        1. 请严格保留原文的Markdown结构，确保所有的占位符（<PH></PH>）及其包裹的内容不被翻译或修改。对于图片描述，请确保其与图片链接分开处理。
+        2. 请确保严格保留原文中markdown结构的标识，不要新增或者删除markdown标识以带来困惑。
+        3. 遇到作者姓名和参考文献时，请保持原文，不进行翻译。
+        4. 专有名词保留：原文中的专有名词（如人名、地名、品牌名等）应保持不变，不要翻译。
+        4.1 不需要翻译的专有名词举例如(不区分大小写)：AI Agent、transformer、LLM、dspy、LangChain等。
+        5. 请仅对需要改进的文本内容进行调整，避免对已经正确的部分（如Markdown结构、占位符等）进行修改。
+        6. 请以标准的 UTF-8 编码返回结果，避免使用 Unicode 转义字符。
+        
+        源文本和初次翻译如下，以 XML 标签 <SOURCE_TEXT></SOURCE_TEXT> 和 <TRANSLATION></TRANSLATION> 分隔：
+        
+        <SOURCE_TEXT>
+        {original_text}
+        </SOURCE_TEXT>
+        
+        <TRANSLATION>
+        {translated_text}
+        </TRANSLATION>
+        
+        请在编写建议和改进时，特别注意以下方面：
+        (i) 准确性：通过纠正添加、误译、遗漏或未翻译的错误，确保翻译准确反映源文本的内容。
+        (ii) 流畅性：确保译文符合 {target_lang} 的语法、拼写和标点符号规则，避免不必要的重复。
+        (iii) 风格：确保翻译反映源文本的风格，并考虑 {country} 的文化背景。
+        (iv) 术语：确保术语使用的一致性，避免上下文不合适或不一致的使用。
+        (v) 其他错误：修正其他可能存在的翻译错误。
+        
+        输出要求：
+        1. 提供具体、有帮助的建议清单。
+        2. 直接输出改进后的译文，不要输出其他非必要内容。
+        3. 改进后的译文应符合上述所有要求，保留原始 Markdown 结构和所有占位符。
+        
+        请按下文json格式要求输出，不要有其他非json内容，并确保Markdown格式未被改变：
+        {{
+        "attention": 你认为翻译质量可以改进的方面,
+        "translate": 改进后的译文
+        }}
+        """
+    else:
+        improvement_prompt = f"""
+        这是一个针对Markdown格式文档内容的翻译质量改进请求，翻译方向是从 {source_lang} 到 {target_lang}。请根据以下标准对提供的译文进行分析、批评，并基于这些批评和建议改进翻译：
 
-注意：
-1. 请严格保留原文的Markdown结构，确保所有的占位符（<PH></PH>）及其包裹的内容不被翻译或修改。对于图片描述，请确保其与图片链接分开处理。
-2. 已经用<PH></PH>标记的部分，包括HTML标签、YAML头部、注释、代码块、表格、公式、行内代码、图片和网址等元素，请勿修改这些部分的内容或格式。
-3. 遇到作者姓名和参考文献时，请保持原文，不进行翻译。
-4. 专有名词保留：原文中的专有名词（如人名、地名、品牌名等）应保持不变，不要翻译。
-4.1 不需要翻译的专有名词举例如(不区分大小写)：AI Agent、transformer、LLM、dspy、LangChain等。
-5. 请仅对需要改进的文本内容进行调整，避免对已经正确的部分（如Markdown结构、占位符等）进行修改。
-6. 请以标准的 UTF-8 编码返回结果，避免使用 Unicode 转义字符。
+        注意：
+        1. 请严格保留原文的Markdown结构，确保所有的占位符（<PH></PH>）及其包裹的内容不被翻译或修改。对于图片描述，请确保其与图片链接分开处理。
+        2. 请确保严格保留原文中markdown结构的标识，不要新增或者删除markdown标识以带来困惑。
+        3. 遇到作者姓名和参考文献时，请保持原文，不进行翻译。
+        4. 专有名词保留：原文中的专有名词（如人名、地名、品牌名等）应保持不变，不要翻译。
+        4.1 不需要翻译的专有名词举例如(不区分大小写)：AI Agent、transformer、LLM、dspy、LangChain等。
+        5. 请仅对需要改进的文本内容进行调整，避免对已经正确的部分（如Markdown结构、占位符等）进行修改。
+        6. 请以标准的 UTF-8 编码返回结果，避免使用 Unicode 转义字符。
 
-源文本和初次翻译如下，以 XML 标签 <SOURCE_TEXT></SOURCE_TEXT> 和 <TRANSLATION></TRANSLATION> 分隔：
+        源文本和初次翻译如下，以 XML 标签 <SOURCE_TEXT></SOURCE_TEXT> 和 <TRANSLATION></TRANSLATION> 分隔：
 
-<SOURCE_TEXT>
-{original_text}
-</SOURCE_TEXT>
+        <SOURCE_TEXT>
+        {original_text}
+        </SOURCE_TEXT>
 
-<TRANSLATION>
-{translated_text}
-</TRANSLATION>
+        <TRANSLATION>
+        {translated_text}
+        </TRANSLATION>
 
-请在编写建议和改进时，特别注意以下方面：
-(i) 准确性：通过纠正添加、误译、遗漏或未翻译的错误，确保翻译准确反映源文本的内容。
-(ii) 流畅性：确保译文符合 {target_lang} 的语法、拼写和标点符号规则，避免不必要的重复。
-(iii) 风格：确保翻译反映源文本的风格，并考虑 {country} 的文化背景。
-(iv) 术语：确保术语使用的一致性，避免上下文不合适或不一致的使用。
-(v) 其他错误：修正其他可能存在的翻译错误。
+        请在编写建议和改进时，特别注意以下方面：
+        (i) 准确性：通过纠正添加、误译、遗漏或未翻译的错误，确保翻译准确反映源文本的内容。
+        (ii) 流畅性：确保译文符合 {target_lang} 的语法、拼写和标点符号规则，避免不必要的重复。
+        (iii) 风格：确保翻译反映源文本的风格，并考虑 {country} 的文化背景。
+        (iv) 术语：确保术语使用的一致性，避免上下文不合适或不一致的使用。
+        (v) 其他错误：修正其他可能存在的翻译错误。
 
-输出要求：
-1. 提供具体、有帮助的建议清单。
-2. 直接输出改进后的译文，不要输出其他非必要内容。
-3. 改进后的译文应符合上述所有要求，保留原始 Markdown 结构和所有占位符。
-
-请按下文json格式要求输出，不要有其他非json内容，并确保Markdown格式未被改变：
-{{
-"attention": 你认为翻译质量可以改进的方面,
-"translate": 改进后的译文
-}}
-"""
+        请仅输出改进后的译文文本内容，保留原始占位符和markdown结构标识，不要添加额外说明或解释。
+        """
 
     # 调用 get_completion 函数获取改进后的翻译结果
-    improved_translation = await get_completion(improvement_prompt, system_message=system_message)
+    improved_translation = await get_completion(improvement_prompt, system_message=system_message,
+                                                result_format=result_format)
     return improved_translation  # 返回改进后的翻译文本
 
 
@@ -383,7 +440,8 @@ async def translate_markdown(
         country: str,
         source_text: str,
         max_tokens: int = TOKENS_PER_CHUNK,
-        semaphore_limit: int = 5
+        semaphore_limit: int = 5,
+        result_format: str = 'message'
 ) -> str:
     """
     使用大型语言模型将Markdown格式的文本进行分块翻译和优化。
@@ -419,11 +477,12 @@ async def translate_markdown(
         """
         try:
             initial_translation = await run_with_semaphore(
-                semaphore, one_chunk_translation(source_lang, target_lang, country, chunk)
+                semaphore, one_chunk_translation(source_lang, target_lang, country, chunk, result_format=result_format)
             )
             improved_translation = await run_with_semaphore(
                 semaphore,
-                one_chunk_improve_translation(source_lang, target_lang, country, chunk, initial_translation)
+                one_chunk_improve_translation(source_lang, target_lang, country, chunk, initial_translation,
+                                              result_format=result_format)
             )
             return improved_translation
         except Exception as e:
